@@ -26,18 +26,29 @@ namespace CSVProcessor
 
         private void btnOpenCSV_Click(object sender, EventArgs e)
         {
-            oDlgCSV.Title = "Select CSV File";
-            oDlgCSV.Filter = "CSV files|*.csv";
-            oDlgCSV.InitialDirectory = @"C:\";
-            oDlgCSV.FileName = string.Empty;
-
-            if (oDlgCSV.ShowDialog() == DialogResult.OK)
+            try
             {
-                string _csvfilename = oDlgCSV.FileName;
+                oDlgCSV.Title = "Select CSV File";
+                oDlgCSV.Filter = "CSV files|*.csv";
+                oDlgCSV.InitialDirectory = @"C:\";
+                oDlgCSV.FileName = string.Empty;
 
-                processCSV(_csvfilename);
+                if (oDlgCSV.ShowDialog() == DialogResult.OK)
+                {
+                    string _csvfilename = oDlgCSV.FileName;
 
-                lblOutputDesc.Text = "Output Text Files are At\n\n" + outputFile1Name + "\n\n" + outputFile2Name;
+                    processCSV(_csvfilename);
+
+                    lblOutputDesc.Text = "Output Text Files are At\n\n" + outputFile1Name + "\n\n" + outputFile2Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                System.GC.Collect();
             }
         }
 
@@ -141,13 +152,13 @@ namespace CSVProcessor
 
         private void writeFrequencyFirstLastNameOutputFiles(Dictionary<string, int> dic)
         {
+            if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
+            {
+                Directory.CreateDirectory(@"C:\CSVOutput\");
+            }
+
             foreach (KeyValuePair<string, int> _dic in dic.OrderByDescending(v => v.Value).OrderBy(k => k.Key))
             {
-                if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
-                {
-                    Directory.CreateDirectory(@"C:\CSVOutput\");
-                }
-
                 using (System.IO.StreamWriter _sw = new System.IO.StreamWriter(outputFile1Name, true))
                 {
                     _sw.WriteLine(_dic.Key + ", " + _dic.Value);
@@ -162,18 +173,19 @@ namespace CSVProcessor
 
         private void writeFrequencyAddressesOutputFiles(Dictionary<string, int> dic)
         {
+            if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
+            {
+                Directory.CreateDirectory(@"C:\CSVOutput\");
+            }
+
             foreach (KeyValuePair<string, int> _dic in dic.OrderByDescending(v => v.Value).OrderBy(k => k.Key.Split(' ')[1]))
             {
-                if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
-                {
-                    Directory.CreateDirectory(@"C:\CSVOutput\");
-                }
-
                 using (System.IO.StreamWriter _sw = new System.IO.StreamWriter(outputFile2Name, true))
                 {
                     _sw.WriteLine(_dic.Key);
                 }
             }
         }
+
     }
 }
