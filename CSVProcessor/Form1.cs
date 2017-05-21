@@ -33,6 +33,8 @@ namespace CSVProcessor
         {
             try
             {
+                lblOutputDesc.Text = string.Empty;
+
                 oDlgCSV.Title = "Select CSV File";
                 oDlgCSV.Filter = "CSV files|*.csv";
                 oDlgCSV.InitialDirectory = @"C:\";
@@ -42,14 +44,17 @@ namespace CSVProcessor
                 {
                     string _csvfilename = oDlgCSV.FileName;
 
-                    processCSV(_csvfilename);
+                    string results = processCSV(_csvfilename);
+
+                    if (results.Equals("failure"))
+                        return;
 
                     lblOutputDesc.Text = "Output Text Files are At\n\n" + outputFile1Name + "\n\n" + outputFile2Name;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Please load the appropriate CSV file...Thank you.");
             }
             finally
             {
@@ -61,7 +66,8 @@ namespace CSVProcessor
         /// Takes CSV (specifically formatted) file name and procudes Dictionary type(s) to write to the .txt file
         /// </summary>
         /// <param name="csvFileName">string</param>
-        public void processCSV(string csvFileName)
+        /// <returns>string</returns>
+        public string processCSV(string csvFileName)
         {
             Dictionary<string, int> _dicFirstNames = new Dictionary<string, int>();
             Dictionary<string, int> _dicLastNames = new Dictionary<string, int>();
@@ -71,91 +77,106 @@ namespace CSVProcessor
             List<string> _listLastNames = new List<string>();
             List<string> _listAddresses = new List<string>();
 
-            using (TextFieldParser _csvParser = new TextFieldParser(csvFileName))
+            try
             {
-                _csvParser.TextFieldType = FieldType.Delimited;
-                _csvParser.SetDelimiters(",");
-                while (!_csvParser.EndOfData)
+                using (TextFieldParser _csvParser = new TextFieldParser(csvFileName))
                 {
-                    if (_csvParser.LineNumber > 1)
+                    _csvParser.TextFieldType = FieldType.Delimited;
+                    _csvParser.SetDelimiters(",");
+                    while (!_csvParser.EndOfData)
                     {
-                        int _colCnt = 1;
-                        string[] _row = _csvParser.ReadFields();
-                        foreach (string _column in _row)
+                        if (_csvParser.LineNumber > 1)
                         {
-                            if (_colCnt == 1) //for FirstName
+                            int _colCnt = 1;
+                            string[] _row = _csvParser.ReadFields();
+                            foreach (string _column in _row)
                             {
-                                _listFirstNames.Add(_column);
-                            }
-                            if (_colCnt == 2) //for LastName
-                            {
-                                _listLastNames.Add(_column);
-                            }
-                            if (_colCnt == 3) //for Address
-                            {
-                                _listAddresses.Add(_column);
-                            }
+                                if (_colCnt == 1) //for FirstName
+                                {
+                                    _listFirstNames.Add(_column);
+                                }
+                                if (_colCnt == 2) //for LastName
+                                {
+                                    _listLastNames.Add(_column);
+                                }
+                                if (_colCnt == 3) //for Address
+                                {
+                                    _listAddresses.Add(_column);
+                                }
 
-                            _colCnt += 1;
+                                _colCnt += 1;
+                            }
+                        }
+                        else
+                        {
+                            string[] _rowHeader = _csvParser.ReadFields();
+
+                            if (_rowHeader.Length != 4 ||
+                                (!_rowHeader[0].Equals("FirstName") || !_rowHeader[1].Equals("LastName") || !_rowHeader[2].Equals("Address") || !_rowHeader[3].Equals("PhoneNumber")))
+                            {
+                                MessageBox.Show("Please load the appropriate CSV file...Thank you.");
+                                return "failure";
+                            }
+                        }
+
+                    }
+
+                    int _cntFirtstNames = 0;
+                    foreach (string _firstname in _listFirstNames)
+                    {
+                        if (!_dicFirstNames.ContainsKey(_firstname))
+                        {
+                            _dicFirstNames.Add(_firstname, 1);
+                        }
+                        else
+                        {
+                            _cntFirtstNames = _dicFirstNames[_firstname];
+                            _cntFirtstNames += 1;
+                            _dicFirstNames[_firstname] = _cntFirtstNames;
+                        }
+
+                    }
+                    writeFrequencyFirstLastNameOutputFiles(_dicFirstNames);
+
+                    int _cntLastNames = 0;
+                    foreach (string _lastname in _listLastNames)
+                    {
+                        if (!_dicLastNames.ContainsKey(_lastname))
+                        {
+                            _dicLastNames.Add(_lastname, 1);
+                        }
+                        else
+                        {
+                            _cntLastNames = _dicLastNames[_lastname];
+                            _cntLastNames += 1;
+                            _dicLastNames[_lastname] = _cntLastNames;
+                        }
+
+                    }
+                    writeFrequencyFirstLastNameOutputFiles(_dicLastNames);
+
+
+                    int _cntAddresses = 0;
+                    foreach (string _address in _listAddresses)
+                    {
+                        if (!_dicAddresses.ContainsKey(_address))
+                        {
+                            _dicAddresses.Add(_address, 1);
+                        }
+                        else
+                        {
+                            _cntAddresses = _dicAddresses[_address];
+                            _cntAddresses += 1;
+                            _dicAddresses[_address] = _cntAddresses;
                         }
                     }
-                    else
-                    {
-                        _csvParser.ReadFields();
-                    }
-
+                    writeFrequencyAddressesOutputFiles(_dicAddresses);
                 }
-
-                int _cntFirtstNames = 0;
-                foreach (string _firstname in _listFirstNames)
-                {
-                    if (!_dicFirstNames.ContainsKey(_firstname))
-                    {
-                        _dicFirstNames.Add(_firstname, 1);
-                    }
-                    else
-                    {
-                        _cntFirtstNames = _dicFirstNames[_firstname];
-                        _cntFirtstNames += 1;
-                        _dicFirstNames[_firstname] = _cntFirtstNames;
-                    }
-
-                }
-                writeFrequencyFirstLastNameOutputFiles(_dicFirstNames);
-
-                int _cntLastNames = 0;
-                foreach (string _lastname in _listLastNames)
-                {
-                    if (!_dicLastNames.ContainsKey(_lastname))
-                    {
-                        _dicLastNames.Add(_lastname, 1);
-                    }
-                    else
-                    {
-                        _cntLastNames = _dicLastNames[_lastname];
-                        _cntLastNames += 1;
-                        _dicLastNames[_lastname] = _cntLastNames;
-                    }
-
-                }
-                writeFrequencyFirstLastNameOutputFiles(_dicLastNames);
-
-
-                int _cntAddresses = 0;
-                foreach (string _address in _listAddresses)
-                {
-                    if (!_dicAddresses.ContainsKey(_address))
-                    {
-                        _dicAddresses.Add(_address, 1);
-                    }
-                    else
-                    {
-                        _cntAddresses = _dicAddresses[_address];
-                        _cntAddresses += 1;
-                        _dicAddresses[_address] = _cntAddresses;
-                    }
-                }
-                writeFrequencyAddressesOutputFiles(_dicAddresses);
+                return "success";
+            }
+            catch (Exception)
+            {
+                return "failure";
             }
         }
 
@@ -164,24 +185,34 @@ namespace CSVProcessor
         /// sorted by frequency in descenfing order and then alphabetically in ascending
         /// </summary>
         /// <param name="dic">Dictionary<string, int></param>
-        public void writeFrequencyFirstLastNameOutputFiles(Dictionary<string, int> dic)
+        /// <returns>string</returns>
+        public string writeFrequencyFirstLastNameOutputFiles(Dictionary<string, int> dic)
         {
-            if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
+            try
             {
-                Directory.CreateDirectory(@"C:\CSVOutput\");
-            }
+                if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
+                {
+                    Directory.CreateDirectory(@"C:\CSVOutput\");
+                }
 
-            foreach (KeyValuePair<string, int> _dic in dic.OrderByDescending(v => v.Value).OrderBy(k => k.Key))
-            {
+                foreach (KeyValuePair<string, int> _dic in dic.OrderByDescending(v => v.Value).OrderBy(k => k.Key))
+                {
+                    using (System.IO.StreamWriter _sw = new System.IO.StreamWriter(outputFile1Name, true))
+                    {
+                        _sw.WriteLine(_dic.Key + ", " + _dic.Value);
+                    }
+                }
+
                 using (System.IO.StreamWriter _sw = new System.IO.StreamWriter(outputFile1Name, true))
                 {
-                    _sw.WriteLine(_dic.Key + ", " + _dic.Value);
+                    _sw.WriteLine("\n\n");
                 }
-            }
 
-            using (System.IO.StreamWriter _sw = new System.IO.StreamWriter(outputFile1Name, true))
+                return "success";
+            }
+            catch (Exception)
             {
-                _sw.WriteLine("\n\n");
+                return "failure";
             }
         }
 
@@ -190,19 +221,29 @@ namespace CSVProcessor
         /// And sorted by frequeuncy first in descending order
         /// </summary>
         /// <param name="dic">Dictionary<string, int></param>
-        public void writeFrequencyAddressesOutputFiles(Dictionary<string, int> dic)
+        /// <returns>string</returns>
+        public string writeFrequencyAddressesOutputFiles(Dictionary<string, int> dic)
         {
-            if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
+            try
             {
-                Directory.CreateDirectory(@"C:\CSVOutput\");
-            }
-
-            foreach (KeyValuePair<string, int> _dic in dic.OrderByDescending(v => v.Value).OrderBy(k => k.Key.Split(' ')[1]))
-            {
-                using (System.IO.StreamWriter _sw = new System.IO.StreamWriter(outputFile2Name, true))
+                if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
                 {
-                    _sw.WriteLine(_dic.Key);
+                    Directory.CreateDirectory(@"C:\CSVOutput\");
                 }
+
+                foreach (KeyValuePair<string, int> _dic in dic.OrderByDescending(v => v.Value).OrderBy(k => k.Key.Split(' ')[1]))
+                {
+                    using (System.IO.StreamWriter _sw = new System.IO.StreamWriter(outputFile2Name, true))
+                    {
+                        _sw.WriteLine(_dic.Key);
+                    }
+                }
+
+                return "success";
+            }
+            catch (Exception)
+            {
+                return "failure";
             }
         }
 

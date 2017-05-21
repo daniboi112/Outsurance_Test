@@ -17,7 +17,8 @@ namespace CSVProcessor_Test
         {
             form = new frmCSVProcessor();
 
-            form.processCSV(@"C:\sandbox\Outsurance\data.csv");
+            //Assert.AreEqual("success", form.processCSV(@"C:\sandbox\Outsurance\data.csv"));
+            Assert.AreEqual("success", form.processCSV(@"C:\sandbox\Outsurance\CSVProcessor\data.csv"));
 
             Dictionary<string, int> _dicFirstNames = new Dictionary<string, int>();
             _dicFirstNames.Add("Dintwe", 2);
@@ -35,11 +36,11 @@ namespace CSVProcessor_Test
             _dicAddresses.Add("3827 Unit Extension", 6);
             _dicAddresses.Add("57 Ale Avenue", 2);
 
-            form.writeFrequencyFirstLastNameOutputFiles(_dicFirstNames);
+            Assert.AreEqual("success", form.writeFrequencyFirstLastNameOutputFiles(_dicFirstNames));
 
-            form.writeFrequencyFirstLastNameOutputFiles(_dicLastNames);
+            Assert.AreEqual("success", form.writeFrequencyFirstLastNameOutputFiles(_dicLastNames));
 
-            form.writeFrequencyAddressesOutputFiles(_dicAddresses);
+            Assert.AreEqual("success", form.writeFrequencyAddressesOutputFiles(_dicAddresses));
         }
     }
 }
