@@ -24,6 +24,11 @@ namespace CSVProcessor
             lblOutputDesc.Text = string.Empty;
         }
 
+        /// <summary>
+        /// Loads the CSV file and processes it by other functions
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOpenCSV_Click(object sender, EventArgs e)
         {
             try
@@ -52,7 +57,11 @@ namespace CSVProcessor
             }
         }
 
-        private void processCSV(string csvFileName)
+        /// <summary>
+        /// Takes CSV (specifically formatted) file name and procudes Dictionary type(s) to write to the .txt file
+        /// </summary>
+        /// <param name="csvFileName">string</param>
+        public void processCSV(string csvFileName)
         {
             Dictionary<string, int> _dicFirstNames = new Dictionary<string, int>();
             Dictionary<string, int> _dicLastNames = new Dictionary<string, int>();
@@ -150,7 +159,12 @@ namespace CSVProcessor
             }
         }
 
-        private void writeFrequencyFirstLastNameOutputFiles(Dictionary<string, int> dic)
+        /// <summary>
+        /// Writes first and last name together with their frequency indicator to .txt file
+        /// sorted by frequency in descenfing order and then alphabetically in ascending
+        /// </summary>
+        /// <param name="dic">Dictionary<string, int></param>
+        public void writeFrequencyFirstLastNameOutputFiles(Dictionary<string, int> dic)
         {
             if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
             {
@@ -171,7 +185,12 @@ namespace CSVProcessor
             }
         }
 
-        private void writeFrequencyAddressesOutputFiles(Dictionary<string, int> dic)
+        /// <summary>
+        /// Write the addresses to the .txt file sorted - (ascending) alphabetically by street name.
+        /// And sorted by frequeuncy first in descending order
+        /// </summary>
+        /// <param name="dic">Dictionary<string, int></param>
+        public void writeFrequencyAddressesOutputFiles(Dictionary<string, int> dic)
         {
             if (!System.IO.Directory.Exists(@"C:\CSVOutput\"))
             {
