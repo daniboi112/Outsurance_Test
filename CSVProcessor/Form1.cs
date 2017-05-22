@@ -54,7 +54,7 @@ namespace CSVProcessor
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Please load the appropriate CSV file...Thank you.");
+                MessageBox.Show("Oops...something went wrong please contact the administrator.");
             }
             finally
             {
@@ -114,7 +114,7 @@ namespace CSVProcessor
                             if (_rowHeader.Length != 4 ||
                                 (!_rowHeader[0].Equals("FirstName") || !_rowHeader[1].Equals("LastName") || !_rowHeader[2].Equals("Address") || !_rowHeader[3].Equals("PhoneNumber")))
                             {
-                                MessageBox.Show("Please load the appropriate CSV file...Thank you.");
+                                MessageBox.Show("Please load appropriate CSV file with the following columns:\n\nFirstName LastName Address PhoneNumber");
                                 return "failure";
                             }
                         }
