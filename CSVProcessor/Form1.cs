@@ -54,7 +54,7 @@ namespace CSVProcessor
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Oops...something went wrong please contact the administrator.");
+                MessageBox.Show("Oops...something went wrong please contact the administrator.\n\n" + ex.Message);
             }
             finally
             {
@@ -174,8 +174,9 @@ namespace CSVProcessor
                 }
                 return "success";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show("Oops...something went wrong please contact the administrator.\n\n" + ex.Message);
                 return "failure";
             }
         }
@@ -210,8 +211,9 @@ namespace CSVProcessor
 
                 return "success";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show("Oops...something went wrong please contact the administrator.\n\n" + ex.Message);
                 return "failure";
             }
         }
@@ -241,8 +243,9 @@ namespace CSVProcessor
 
                 return "success";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show("Oops...something went wrong please contact the administrator.\n\n" + ex.Message);
                 return "failure";
             }
         }
